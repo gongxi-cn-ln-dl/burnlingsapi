@@ -13,8 +13,8 @@ client = MongoClient(uri, server_api=ServerApi('1'))
 db = client.AskBox
 collection = db.users
 
-server = flask.Flask(__name__)
-cors = CORS(server)
+app = flask.Flask(__name__)
+cors = CORS(app)
 
 ErrorCode = {
     '10000': 'Success',
@@ -62,11 +62,11 @@ def getTextFromBdCode(bdCode):
     a.pop('bdCode')
     return dict(a)
 
-@server.route('/')
+@app.route('/')
 def test():
   return "SUCCESS"
 
-@server.route('/vue-project/login', methods=['post'])
+@app.route('/vue-project/login', methods=['post'])
 def _vueProject_login():
     dt = flask.request.get_json()
     if (checkIfUserNameExist(dt['username']) == False):
@@ -80,7 +80,7 @@ def _vueProject_login():
         return getReturnText(True, others=others)
     return getReturnText(False, '10013')
 
-@server.route('/vue-project/register', methods=['post'])
+@app.route('/vue-project/register', methods=['post'])
 def _vueProject_register():
     dt = flask.request.get_json()
     if checkIfUserNameExist(dt['username']):
@@ -95,7 +95,7 @@ def _vueProject_register():
     result = collection.insert_one(dt)
     return getReturnText(True, others=others)
 
-@server.route('/vue-project/submitText', methods=['post'])
+@app.route('/vue-project/submitText', methods=['post'])
 def _vueProject_submitText():
     dt = flask.request.get_json()
     if(checkToken(dt['userId'], dt['token']) == False):
@@ -113,7 +113,7 @@ def _vueProject_submitText():
     print(result)
     return getReturnText(True, others={'bdCode':bdCode})
 
-@server.route('/vue-project/BangDing', methods=['post'])
+@app.route('/vue-project/BangDing', methods=['post'])
 def _vueProject_BangDing():
     dt = flask.request.get_json()
     if(checkToken(dt['userId'], dt['token']) == False):
@@ -123,7 +123,7 @@ def _vueProject_BangDing():
     
     return getReturnText(True)
     
-@server.route('/vue-project/getAskedQuestions', methods=['post'])
+@app.route('/vue-project/getAskedQuestions', methods=['post'])
 def _vueProject_getAskedQuestions():
     dt = flask.request.get_json()
     if(checkToken(dt['userId'], dt['token']) == False):
@@ -138,12 +138,12 @@ def _vueProject_getAskedQuestions():
         texts = []
     return getReturnText(True,others={'texts':texts})
 
-@server.route('/vue-project/getUserNameFromUserId',methods=['GET'])
+@app.route('/vue-project/getUserNameFromUserId',methods=['GET'])
 def _vueProject_getUserNameFromUserId():
     userId = flask.request.args.get('userId')
     return getReturnText(True,others={'username':collection.find_one({'userId':userId})['username']})
 
-@server.route('/vue-project/getMyQuestions',methods=['post'])
+@app.route('/vue-project/getMyQuestions',methods=['post'])
 def _vueProject_getMyQuestions():
     dt = flask.request.get_json()
     if(checkToken(dt['userId'], dt['token']) == False):
@@ -158,7 +158,7 @@ def _vueProject_getMyQuestions():
     print(result)
     return getReturnText(True,others={'texts':result})
 
-@server.route('/vue-project/submitAnswer',methods=['post'])
+@app.route('/vue-project/submitAnswer',methods=['post'])
 def _vueProject_submitAnswer():
     dt = flask.request.get_json()
     if(checkToken(dt['userId'], dt['token']) == False):
